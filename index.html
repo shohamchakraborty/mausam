@@ -4,9 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mausam</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Mausam 🌦️</h1>
-  <p>Live weather, coming soon.</p>
+  <main class="card">
+    <p id="place">Kolkata</p>
+    <h1 id="temp">--°C</h1>
+    <p id="condition">Loading…</p>
+    <div class="details">
+      <span>Feels like <b id="feels">--</b></span>
+      <span>Humidity <b id="humidity">--</b></span>
+      <span>Wind <b id="wind">--</b></span>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
 </body>
 </html>
