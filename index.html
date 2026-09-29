@@ -5,18 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mausam</title>
   <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main class="card">
-    <p id="place">Kolkata</p>
-    <h1 id="temp">--°C</h1>
-    <p id="condition">Loading…</p>
-    <div class="details">
-      <span>Feels like <b id="feels">--</b></span>
-      <span>Humidity <b id="humidity">--</b></span>
-      <span>Wind <b id="wind">--</b></span>
-    </div>
-  </main>
+</head><body>
+  <div class="container">
+    <main class="card">
+      <p id="place">Kolkata</p>
+      <div id="icon" class="icon">⏳</div>
+      <h1 id="temp">--°C</h1>
+      <p id="condition">Loading…</p>
+      <div class="details">
+        <span>Feels like <b id="feels">--</b></span>
+        <span>Humidity <b id="humidity">--</b></span>
+        <span>Wind <b id="wind">--</b></span>
+      </div>
+    </main>
+
+    <section class="panel">
+      <h2>Next 24 hours</h2>
+      <div id="hourly" class="hourly"></div>
+    </section>
+
+    <section class="panel">
+      <h2>7-day forecast</h2>
+      <div id="daily" class="daily"></div>
+    </section>
+  </div>
 
   <script src="app.js"></script>
 </body>
