@@ -1,5 +1,9 @@
-const LAT = 22.57;
-const LON = 88.36;
+const DEFAULT_PLACE = { name: "Kolkata", lat: 22.57, lon: 88.36, population: 4500000 };
+
+// Test switches in the web address, e.g.  index.html?weather=stormy&night=1
+const params = new URLSearchParams(window.location.search);
+const FORCE_SCENE = params.get("weather");  // clear, cloudy, foggy, rainy, stormy
+const FORCE_NIGHT = params.get("night");    // 1 = night, 0 = day
 
 function getScene(code) {
   if (code === 0) return "clear";
@@ -25,11 +29,7 @@ function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function showCurrent(current) {
-  const scene = getScene(current.weather_code);
-  const isDay = current.is_day === 1;
-
-  document.getElementById("icon").textContent = getIcon(scene, isDay);
+function showCurrent(current, scene) {
   document.getElementById("temp").textContent = `${Math.round(current.temperature_2m)}°C`;
   document.getElementById("condition").textContent = capitalize(scene);
   document.getElementById("feels").textContent = `${Math.round(current.apparent_temperature)}°C`;
@@ -76,21 +76,37 @@ function showDaily(daily) {
   document.getElementById("daily").innerHTML = html;
 }
 
-async function loadWeather() {
+async function loadWeather(place) {
+  document.getElementById("place").textContent = place.name;
+  document.getElementById("condition").textContent = "Loading…";
+
   const url =
     "https://api.open-meteo.com/v1/forecast" +
-    `?latitude=${LAT}&longitude=${LON}` +
+    `?latitude=${place.lat}&longitude=${place.lon}` +
     "&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day" +
     "&hourly=temperature_2m,weather_code,is_day" +
     "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
     "&forecast_days=7&timezone=auto";
 
-  const response = await fetch(url);
-  const data = await response.json();
+  let data;
+  try {
+    const response = await fetch(url);
+    data = await response.json();
+  } catch (error) {
+    document.getElementById("condition").textContent = "Couldn't reach the weather service";
+    return;
+  }
 
-  showCurrent(data.current);
+  const scene = FORCE_SCENE || getScene(data.current.weather_code);
+  const isDay = FORCE_NIGHT !== null ? FORCE_NIGHT !== "1" : data.current.is_day === 1;
+
+  showCurrent(data.current, scene);
   showHourly(data.hourly, data.current.time);
   showDaily(data.daily);
+
+  // Tell the 3D scene (scene.js) what the weather is
+  window.currentWeather = { scene, isDay, place: { ...place, elevation: data.elevation } };
+  window.dispatchEvent(new CustomEvent("weather", { detail: window.currentWeather }));
 }
 
-loadWeather();
+// (search.js decides which place to load first)

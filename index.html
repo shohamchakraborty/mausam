@@ -4,12 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mausam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="style.css">
-</head><body>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
   <div class="container">
-    <main class="card">
+    <nav class="topbar">
+      <span class="brand">mausam</span>
+      <div class="search">
+        <input id="search" type="search" placeholder="Search any city…" autocomplete="off">
+        <ul id="results" class="results" hidden></ul>
+      </div>
+      <button id="locate" class="icon-btn" title="Use my location" aria-label="Use my location">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        </svg>
+      </button>
+      <button id="open-map" class="icon-btn" title="Pick on the map" aria-label="Pick on the map">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>
+        </svg>
+      </button>
+    </nav>
+
+    <header class="hero">
       <p id="place">Kolkata</p>
-      <div id="icon" class="icon">⏳</div>
       <h1 id="temp">--°C</h1>
       <p id="condition">Loading…</p>
       <div class="details">
@@ -17,7 +48,7 @@
         <span>Humidity <b id="humidity">--</b></span>
         <span>Wind <b id="wind">--</b></span>
       </div>
-    </main>
+    </header>
 
     <section class="panel">
       <h2>Next 24 hours</h2>
@@ -30,6 +61,23 @@
     </section>
   </div>
 
+  <!-- The map pops up over everything -->
+  <div id="map-modal" class="modal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <span>Tap anywhere on Earth</span>
+        <button id="close-map" class="icon-btn" aria-label="Close map">✕</button>
+      </div>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <!-- Covers the screen for a moment while the city changes -->
+  <div id="curtain"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
+  <script src="search.js"></script>
+  <script type="module" src="scene.js"></script>
 </body>
 </html>
