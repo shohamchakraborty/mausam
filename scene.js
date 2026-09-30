@@ -166,6 +166,42 @@ function fitCamera() {
 window.addEventListener("resize", fitCamera);
 fitCamera();
 
+// ---------- 9. Quality: if this device struggles, quietly lower the detail ----------
+let measuring = { start: null, frames: 0, done: false };
+
+function lowerQuality(reason) {
+  renderer.setPixelRatio(1);               // fewer pixels to draw
+  renderer.shadowMap.enabled = false;      // shadows are expensive
+  scene.traverse((obj) => obj.material && (obj.material.needsUpdate = true));
+  weather.setDetail(0.5);                  // half the raindrops
+  console.log(`Mausam: ${reason}, switched to lighter graphics`);
+}
+
+// Test switch in the web address: ?quality=high or ?quality=low
+const forcedQuality = new URLSearchParams(window.location.search).get("quality");
+if (forcedQuality === "high") measuring.done = true;
+if (forcedQuality === "low") {
+  measuring.done = true;
+  lowerQuality("low quality requested");
+}
+
+function checkSpeed(t) {
+  if (measuring.done) return;
+  if (measuring.start === null) {
+    if (t > 1.5) measuring.start = t;   // skip the first moments (loading hiccups)
+    return;
+  }
+  measuring.frames++;
+  const elapsed = t - measuring.start;
+  if (elapsed < 3) return;
+  measuring.done = true;
+  const fps = measuring.frames / elapsed;
+  if (fps < 40) lowerQuality(`running at ${fps.toFixed(0)} fps`);
+}
+
+// People who turn on "reduce motion" in their system settings get a still camera
+const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 const clock = new THREE.Clock();
 const lookTarget = LOOK_AT.clone();
 
@@ -173,6 +209,7 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.1);  // seconds since the last frame
   const t = clock.elapsedTime;                 // seconds since the page opened
 
+  checkSpeed(t);
   animateWater(t);
   weather.update(dt, t);
   city.setNight(weather.night);
@@ -180,7 +217,7 @@ function animate() {
 
   // On phones the screen is narrow, so the camera slowly pans along the riverfront
   const portrait = camera.aspect < 1;
-  const sweep = portrait ? Math.sin(t * 0.07) * 32 : Math.sin(t * 0.1) * 2;
+  const sweep = calm ? 0 : portrait ? Math.sin(t * 0.07) * 32 : Math.sin(t * 0.1) * 2;
 
   // Camera gently drifts toward the mouse (and rises during a city change)
   lift += (liftTarget - lift) * 0.05;

@@ -52,6 +52,7 @@ function moodFor(name, isDay) {
 export function createWeather({ scene, sky, sun, hemi, water }) {
   let target = moodFor("clear", true);
   const now = moodFor("clear", true);   // the values on screen right now, sliding toward target
+  let detail = 1;                        // 1 = full quality, lower = fewer raindrops (for slow devices)
 
   // ----- Clouds: bunches of low-poly balls -----
   const cloudMat = new THREE.MeshStandardMaterial({ color: "#ffffff", flatShading: true, roughness: 1 });
@@ -179,6 +180,10 @@ export function createWeather({ scene, sky, sun, hemi, water }) {
       target = moodFor(name, isDay);
     },
 
+    setDetail(amount) {
+      detail = amount;
+    },
+
     // 0 = full day, 1 = full night (the city uses this to switch its lights on)
     get night() {
       return now.night;
@@ -238,7 +243,7 @@ export function createWeather({ scene, sky, sun, hemi, water }) {
       });
 
       // Rain
-      const active = Math.round(now.drops);
+      const active = Math.round(now.drops * detail);
       rain.visible = active > 10;
       const len = now.speed * 0.035;
       for (let i = 0; i < active; i++) {
@@ -254,7 +259,7 @@ export function createWeather({ scene, sky, sun, hemi, water }) {
       rainGeo.attributes.position.needsUpdate = true;
 
       // Splashes
-      const activeSplashes = Math.min(splashes.length, Math.round(now.drops / 50));
+      const activeSplashes = Math.min(splashes.length, Math.round((now.drops * detail) / 50));
       splashes.forEach((ring, i) => {
         if (i >= activeSplashes) {
           ring.material.opacity = 0;
@@ -272,4 +277,4 @@ export function createWeather({ scene, sky, sun, hemi, water }) {
       });
     },
   };
-}   
+}

@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mausam</title>
+  <title>Mausam · live weather in 3D</title>
+  <meta name="description" content="Live weather for any place on Earth, shown as an animated 3D city: rain, storms, fog and night lights over Kolkata's Howrah Bridge.">
+  <meta name="theme-color" content="#1b2440">
+  <meta property="og:title" content="Mausam · live weather in 3D">
+  <meta property="og:description" content="Live weather for any place on Earth, shown as an animated 3D city.">
+  <meta property="og:image" content="https://shohamchakraborty.github.io/mausam/docs/kolkata-day.jpg">
+  <meta property="og:url" content="https://shohamchakraborty.github.io/mausam/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌦️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
@@ -32,6 +40,7 @@
           <circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
         </svg>
       </button>
+      <button id="unit" class="icon-btn" title="Switch °C / °F" aria-label="Switch between Celsius and Fahrenheit">°C</button>
       <button id="open-map" class="icon-btn" title="Pick on the map" aria-label="Pick on the map">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>
@@ -59,6 +68,12 @@
       <h2>7-day forecast</h2>
       <div id="daily" class="daily"></div>
     </section>
+
+    <footer class="footer">
+      Weather data by <a href="https://open-meteo.com/">Open-Meteo</a> ·
+      Places by <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ·
+      Built by <a href="https://github.com/shohamchakraborty">Shoham Chakraborty</a>
+    </footer>
   </div>
 
   <!-- The map pops up over everything -->

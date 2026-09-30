@@ -25,16 +25,30 @@ function getIcon(scene, isDay) {
   return icons[scene];
 }
 
+// ----- Units: °C or °F, remembered on this device -----
+let unit = "C";
+try {
+  unit = localStorage.getItem("mausam-unit") || "C";
+} catch {}
+
+function temp(celsius) {
+  return Math.round(unit === "F" ? celsius * 9 / 5 + 32 : celsius);
+}
+
+function wind(kmh) {
+  return unit === "F" ? `${Math.round(kmh * 0.621)} mph` : `${Math.round(kmh)} km/h`;
+}
+
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function showCurrent(current, scene) {
-  document.getElementById("temp").textContent = `${Math.round(current.temperature_2m)}°C`;
+  document.getElementById("temp").textContent = `${temp(current.temperature_2m)}°${unit}`;
   document.getElementById("condition").textContent = capitalize(scene);
-  document.getElementById("feels").textContent = `${Math.round(current.apparent_temperature)}°C`;
+  document.getElementById("feels").textContent = `${temp(current.apparent_temperature)}°${unit}`;
   document.getElementById("humidity").textContent = `${current.relative_humidity_2m}%`;
-  document.getElementById("wind").textContent = `${current.wind_speed_10m} km/h`;
+  document.getElementById("wind").textContent = wind(current.wind_speed_10m);
 }
 
 function showHourly(hourly, nowTime) {
@@ -51,7 +65,7 @@ function showHourly(hourly, nowTime) {
       <div class="hour">
         <div class="time">${label}</div>
         <div class="emoji">${getIcon(scene, isDay)}</div>
-        <div class="t">${Math.round(hourly.temperature_2m[i])}°</div>
+        <div class="t">${temp(hourly.temperature_2m[i])}°</div>
       </div>`;
   }
   document.getElementById("hourly").innerHTML = html;
@@ -69,12 +83,32 @@ function showDaily(daily) {
         <span>${name}</span>
         <span>${getIcon(scene, true)}</span>
         <span class="range">
-          ${Math.round(daily.temperature_2m_max[i])}°<span class="min">${Math.round(daily.temperature_2m_min[i])}°</span>
+          ${temp(daily.temperature_2m_max[i])}°<span class="min">${temp(daily.temperature_2m_min[i])}°</span>
         </span>
       </div>`;
   }
   document.getElementById("daily").innerHTML = html;
 }
+
+// Remember the last weather so switching °C/°F can redraw without fetching again
+let lastShown = null;
+
+function showEverything() {
+  document.getElementById("unit").textContent = `°${unit}`;
+  if (!lastShown) return;
+  const { data, scene } = lastShown;
+  showCurrent(data.current, scene);
+  showHourly(data.hourly, data.current.time);
+  showDaily(data.daily);
+}
+
+document.getElementById("unit").addEventListener("click", () => {
+  unit = unit === "C" ? "F" : "C";
+  try {
+    localStorage.setItem("mausam-unit", unit);
+  } catch {}
+  showEverything();
+});
 
 async function loadWeather(place) {
   document.getElementById("place").textContent = place.name;
@@ -100,9 +134,8 @@ async function loadWeather(place) {
   const scene = FORCE_SCENE || getScene(data.current.weather_code);
   const isDay = FORCE_NIGHT !== null ? FORCE_NIGHT !== "1" : data.current.is_day === 1;
 
-  showCurrent(data.current, scene);
-  showHourly(data.hourly, data.current.time);
-  showDaily(data.daily);
+  lastShown = { data, scene };
+  showEverything();
 
   // Tell the 3D scene (scene.js) what the weather is
   window.currentWeather = { scene, isDay, place: { ...place, elevation: data.elevation } };

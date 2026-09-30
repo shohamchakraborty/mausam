@@ -251,3 +251,20 @@ body {
   .brand { width: 100%; }
   .search { flex: 1; width: auto; }
 }
+
+/* ----- Unit button and footer ----- */
+#unit {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  padding-top: 10px;
+}
+
+.footer a {
+  color: inherit;
+}
